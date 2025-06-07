@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <title>Statistik Kekerasan DIY - Futuristik Ungu Neon</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <!-- Bootstrap -->
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500&display=swap');
+
+    :root {
+      --bg-dark: #0a0a0a;
+      --bg-card: #121212;
+      --text-primary: #a855f7; /* ungu neon utama */
+      --text-secondary: #d8b4fe; /* ungu neon muda */
+      --text-muted: #444;
+      --shadow-neon: 0 0 15px #a855f7, 0 0 30px #a855f7;
+      --border-radius: 15px;
+      --btn-bg: transparent;
+      --btn-border: #a855f7;
+      --btn-hover-bg: #a855f7;
+      --btn-hover-color: #0a0a0a;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: 'Orbitron', monospace;
+      margin: 0;
+      padding: 0 20px 40px;
+      user-select: none;
+    }
+
+    .header {
+      background: var(--bg-card);
+      padding: 30px 25px;
+      border-radius: var(--border-radius);
+      margin-top: 40px;
+      box-shadow: var(--shadow-neon);
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    .header h2 {
+      font-weight: 700;
+      font-size: 2.5rem;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .header p {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      margin-top: 0;
+      margin-bottom: 15px;
+    }
+
+    a.btn-light {
+      color: var(--text-primary);
+      border: 2px solid var(--btn-border);
+      border-radius: var(--border-radius);
+      padding: 8px 25px;
+      font-weight: 600;
+      text-transform: uppercase;
+      background: var(--btn-bg);
+      transition: 0.3s ease all;
+      box-shadow: 0 0 10px var(--text-primary);
+    }
+
+    a.btn-light:hover {
+      background: var(--btn-hover-bg);
+      color: var(--btn-hover-color);
+      box-shadow: 0 0 20px var(--text-primary), 0 0 40px var(--text-primary);
+      text-decoration: none;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: none;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow-neon);
+      color: var(--text-primary);
+      transition: transform 0.3s ease;
+      user-select: text;
+    }
+
+    .card:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px var(--text-primary), 0 0 60px var(--text-primary);
+    }
+
+    .card-header {
+      background: transparent;
+      border-bottom: 1px solid var(--text-secondary);
+      font-weight: 700;
+      font-size: 1.25rem;
+      text-transform: uppercase;
+      color: var(--text-secondary);
+      letter-spacing: 1.2px;
+      padding: 20px 25px;
+      user-select: text;
+    }
+
+    .list-group-item {
+      background: transparent;
+      border: none;
+      color: var(--text-primary);
+      font-weight: 600;
+      font-size: 0.95rem;
+      letter-spacing: 0.5px;
+      padding-left: 0;
+      user-select: text;
+    }
+
+    .list-group-item strong {
+      color: var(--text-secondary);
+    }
+
+    .pengaduan-terakhir {
+      margin-top: 50px;
+    }
+
+    /* Chart.js canvas fix */
+    canvas {
+      user-select: none;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header mb-5">
+      <h2>📈 Statistik Kekerasan di D.I. Yogyakarta</h2>
+      <p>Visualisasi data berdasarkan kabupaten dan jenis kekerasan</p>
+      <a href="index.html" class="btn btn-light mt-2">← Kembali ke Peta</a>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">Total Kasus per Kabupaten</div>
+          <div class="card-body">
+            <canvas id="chartTotal"></canvas>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="card shadow-sm">
+          <div class="card-header">Perbandingan Korban Perempuan vs Pria</div>
+          <div class="card-body">
+            <canvas id="chartGender"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="pengaduan-terakhir">
+      <div class="card shadow-sm">
+        <div class="card-header">📋 Pengaduan Terakhir</div>
+        <div class="card-body" id="dataPengaduan">
+          <p class="text-muted" style="color: #444;">Tidak ada data pengaduan yang ditemukan.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const labels = ["Kulon Progo", "Bantul", "Gunung Kidul", "Sleman", "Yogyakarta"];
+    const totalKasus = [366, 477, 346, 1, 72];
+    const perempuan = [324, 409, 334, 1, 57];
+    const pria = [42, 68, 12, 0, 15];
+
+    const neonPurple = '#a855f7';      // ungu neon utama
+    const neonPurpleLight = '#d8b4fe'; // ungu neon muda
+    const neonPurpleDark = '#7c3aed';  // ungu neon gelap
+
+    // Chart Total Kasus
+    new Chart(document.getElementById("chartTotal"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [{
+          label: "Total Kasus",
+          data: totalKasus,
+          backgroundColor: neonPurple,
+          borderRadius: 6,
+          borderSkipped: false,
+          barPercentage: 0.6,
+          categoryPercentage: 0.7,
+          hoverBackgroundColor: neonPurpleLight,
+        }],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { display: false },
+          title: {
+            display: true,
+            text: "Total Kasus per Kabupaten",
+            color: neonPurple,
+            font: { size: 18, weight: 'bold' },
+          },
+          tooltip: {
+            backgroundColor: '#1a0a32',
+            titleColor: neonPurple,
+            bodyColor: neonPurpleLight,
+            cornerRadius: 6,
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: neonPurple,
+              font: { weight: '600' },
+            },
+            grid: { display: false },
+          },
+          y: {
+            ticks: {
+              color: neonPurple,
+              font: { weight: '600' },
+            },
+            grid: {
+              color: '#320d83',
+              borderDash: [5, 5],
+            },
+          },
+        },
+      },
+    });
+
+    // Chart Perbandingan Gender
+    new Chart(document.getElementById("chartGender"), {
+      type: "bar",
+      data: {
+        labels: labels,
+        datasets: [
+          {
+            label: "Perempuan",
+            data: perempuan,
+            backgroundColor: neonPurpleLight,
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.5,
+            categoryPercentage: 0.6,
+            hoverBackgroundColor: neonPurple,
+          },
+          {
+            label: "Pria",
+            data: pria,
+            backgroundColor: neonPurpleDark,
+            borderRadius: 6,
+            borderSkipped: false,
+            barPercentage: 0.5,
+            categoryPercentage: 0.6,
+            hoverBackgroundColor: neonPurple,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          title: {
+            display: true,
+            text: "Jumlah Korban Berdasarkan Gender",
+            color: neonPurple,
+            font: { size: 18, weight: 'bold' },
+          },
+          tooltip: {
+            backgroundColor: '#1a0a32',
+            titleColor: neonPurpleLight,
+            bodyColor: neonPurpleDark,
+            cornerRadius: 6,
+          },
+        },
+        scales: {
+          x: {
+            ticks: {
+              color: neonPurple,
+              font: { weight: '600' },
+            },
+            grid: { display: false },
+          },
+          y: {
+            ticks: {
+              color: neonPurple,
+              font: { weight: '600' },
+            },
+            grid: {
+              color: '#320d83',
+              borderDash: [5, 5],
+            },
+          },
+        },
+      },
+    });
+
+    // Tampilkan data pengaduan terakhir dari localStorage
+    const pengaduan = JSON.parse(localStorage.getItem("pengaduanTerakhir"));
+    const pengaduanDiv = document.getElementById("dataPengaduan");
+
+    if (pengaduan) {
+      pengaduanDiv.innerHTML = `
+        <ul class="list-group">
+          <li class="list-group-item"><strong>Nama Pelapor:</strong> ${pengaduan.nama}</li>
+          <li class="list-group-item"><strong>Jenis Kelamin Korban:</strong> ${pengaduan.gender}</li>
+          <li class="list-group-item"><strong>Kabupaten/Kota:</strong> ${pengaduan.kabupaten}</li>
+          <li class="list-group-item"><strong>Jenis Kekerasan:</strong> ${pengaduan.jenis}</li>
+          <li class="list-group-item"><strong>Deskripsi:</strong> ${pengaduan.deskripsi}</li>
+        </ul>
+      `;
+    }
+  </script>
+</body>
+</html>

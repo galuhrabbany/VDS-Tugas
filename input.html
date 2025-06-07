@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Form Pengaduan Kekerasan</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    /* Reset body */
+    body {
+      margin: 0;
+      background-color: #0d0d18; /* very dark navy/black */
+      font-family: 'Orbitron', sans-serif; /* futuristik font (Google Fonts) */
+      color: #dcd6f7; /* light neon purple-ish */
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    /* Container */
+    .form-container {
+      background: #121025;
+      border-radius: 24px;
+      box-shadow:
+        0 0 10px #8a2be2,
+        0 0 20px #9b30ff,
+        0 0 40px #7a00ff;
+      padding: 40px 30px;
+      width: 100%;
+      max-width: 600px;
+      border: 1px solid #8a2be2;
+      position: relative;
+    }
+
+    /* Neon glow for header */
+    .form-header {
+      background: linear-gradient(90deg, #6a0dad, #9b30ff);
+      border-radius: 16px;
+      text-align: center;
+      padding: 18px 10px;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1.8rem;
+      text-shadow:
+        0 0 8px #9b30ff,
+        0 0 20px #9b30ff;
+      margin-bottom: 30px;
+      letter-spacing: 1.2px;
+    }
+
+    /* Labels */
+    label.form-label {
+      font-weight: 600;
+      color: #c4b5fd;
+      text-shadow: 0 0 5px #6a0dad;
+    }
+
+    /* Inputs and selects */
+    input.form-control,
+    select.form-select,
+    textarea.form-control {
+      background: #1a143d;
+      border: 1.5px solid #7a00ff;
+      border-radius: 12px;
+      color: #dcd6f7;
+      font-size: 1rem;
+      box-shadow: inset 0 0 8px #8a2be2;
+      transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    input.form-control::placeholder,
+    textarea.form-control::placeholder {
+      color: #9b30ffaa;
+      font-style: italic;
+    }
+
+    input.form-control:focus,
+    select.form-select:focus,
+    textarea.form-control:focus {
+      border-color: #d580ff;
+      outline: none;
+      box-shadow:
+        0 0 8px #d580ff,
+        inset 0 0 12px #d580ff;
+      background: #220d66;
+      color: #f0e6ff;
+    }
+
+    /* Button neon style */
+    button.btn-primary {
+      background-color: #9b30ff;
+      border: none;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 12px;
+      border-radius: 14px;
+      box-shadow:
+        0 0 12px #d580ff,
+        0 0 25px #d580ff;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+      width: 100%;
+    }
+
+    button.btn-primary:hover {
+      background-color: #d580ff;
+      box-shadow:
+        0 0 20px #f3bcff,
+        0 0 40px #f3bcff;
+    }
+
+    /* For selects option color */
+    select.form-select option {
+      background: #1a143d;
+      color: #dcd6f7;
+    }
+
+    /* Scrollbar for textarea */
+    textarea.form-control {
+      resize: vertical;
+    }
+
+    /* Responsive tweaks */
+    @media (max-width: 600px) {
+      .form-container {
+        padding: 30px 20px;
+      }
+      .form-header {
+        font-size: 1.5rem;
+        padding: 14px 10px;
+      }
+    }
+  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+  <div class="form-container">
+    <div class="form-header">
+      <h4>Form Pengaduan Kekerasan</h4>
+    </div>
+    <form id="pengaduanForm">
+      <div class="mb-3">
+        <label for="nama" class="form-label">Nama Pelapor</label>
+        <input type="text" id="nama" class="form-control" required />
+      </div>
+      <div class="mb-3">
+        <label for="genderKorban" class="form-label">Jenis Kelamin Korban</label>
+        <select id="genderKorban" class="form-select" required>
+          <option value="">Pilih...</option>
+          <option value="Perempuan">Perempuan</option>
+          <option value="Pria">Pria</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="kabupaten" class="form-label">Kabupaten/Kota Kejadian</label>
+        <select id="kabupaten" class="form-select" required>
+          <option value="">Pilih...</option>
+          <option value="KULON PROGO">KULON PROGO</option>
+          <option value="BANTUL">BANTUL</option>
+          <option value="GUNUNG KIDUL">GUNUNG KIDUL</option>
+          <option value="SLEMAN">SLEMAN</option>
+          <option value="YOGYAKARTA">YOGYAKARTA</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="jenis" class="form-label">Jenis Kekerasan</label>
+        <select id="jenis" class="form-select" required>
+          <option value="">Pilih...</option>
+          <option value="Fisik">Fisik</option>
+          <option value="Psikis">Psikis</option>
+          <option value="Seksual">Seksual</option>
+          <option value="TPPO">TPPO</option>
+          <option value="Penelantaran">Penelantaran</option>
+        </select>
+      </div>
+      <div class="mb-3">
+        <label for="latitude" class="form-label">Latitude</label>
+        <input type="number" id="latitude" class="form-control" placeholder="-7.7956" required step="any" />
+      </div>
+      <div class="mb-3">
+        <label for="longitude" class="form-label">Longitude</label>
+        <input type="number" id="longitude" class="form-control" placeholder="110.3695" required step="any" />
+      </div>
+      <div class="mb-3">
+        <label for="deskripsi" class="form-label">Deskripsi Singkat</label>
+        <textarea id="deskripsi" class="form-control" rows="4" required></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary w-100">Kirim Pengaduan</button>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("pengaduanForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const data = {
+        nama: document.getElementById("nama").value,
+        gender: document.getElementById("genderKorban").value,
+        kabupaten: document.getElementById("kabupaten").value,
+        jenis: document.getElementById("jenis").value,
+        latitude: parseFloat(document.getElementById("latitude").value),
+        longitude: parseFloat(document.getElementById("longitude").value),
+        deskripsi: document.getElementById("deskripsi").value,
+      };
+      const semua = JSON.parse(localStorage.getItem("semuaPengaduan")) || [];
+      semua.push(data);
+      localStorage.setItem("semuaPengaduan", JSON.stringify(semua));
+      localStorage.setItem("pengaduanTerakhir", JSON.stringify(data));
+      window.location.href = "statistik.html";
+    });
+  </script>
+</body>
+</html>

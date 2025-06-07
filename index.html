@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Titik Peduli – WebGIS Kekerasan DIY</title>
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --primary-bg: #0a0a1a;
+        --secondary-bg: #1b0a41;
+        --primary-text: #e0d7f5;
+        --secondary-text: #a394c7;
+        --accent: #9c4fff;
+        --hover-bg: #2c1d63;
+        --card-shadow: 0 0 15px #9c4fff88;
+        --border-radius: 14px;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        background-color: var(--primary-bg);
+        color: var(--primary-text);
+        font-family: "Poppins", sans-serif;
+      }
+
+      .header {
+        background: linear-gradient(90deg, #5f3dc4, #a569ff);
+        padding: 25px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        text-align: center;
+        color: var(--primary-text);
+        text-shadow: 0 0 8px #cfaaffcc;
+      }
+
+      .header h2 {
+        font-weight: 600;
+      }
+
+      #map {
+        height: 80vh;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: 2px solid var(--accent);
+      }
+
+      .sidebar {
+        background: linear-gradient(180deg, #2c1d63, #3f2e8e);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        height: 100%;
+        color: var(--primary-text);
+        text-shadow: 0 0 5px #a079ffbb;
+      }
+
+      .sidebar h5 {
+        color: var(--accent);
+        font-weight: 600;
+        margin-bottom: 15px;
+        text-shadow: 0 0 6px #9c4fff;
+      }
+
+      .stat-card {
+        background-color: var(--hover-bg);
+        padding: 20px;
+        border-radius: var(--border-radius);
+        box-shadow: 0 0 12px #9c4fffaa;
+        transition: all 0.3s ease-in-out;
+        color: var(--primary-text);
+        text-shadow: 0 0 4px #9c4fffbb;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 0 20px #9c4fffdd;
+      }
+
+      .btn-primary {
+        background-color: var(--accent);
+        border: none;
+        color: var(--primary-text);
+        transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        text-shadow: 0 0 6px #cfaaff;
+      }
+
+      .btn-primary:hover {
+        background-color: #7f3fff;
+        box-shadow: 0 0 15px #b166ff;
+      }
+
+      .btn-outline-secondary {
+        border-color: var(--accent);
+        color: var(--accent);
+        text-shadow: 0 0 5px #9c4fff;
+      }
+
+      .btn-outline-secondary:hover {
+        background-color: var(--hover-bg);
+        color: var(--primary-text);
+        text-shadow: none;
+      }
+
+      select.form-select {
+        background-color: var(--hover-bg);
+        color: var(--primary-text);
+        border: none;
+        border-radius: var(--border-radius);
+        box-shadow: 0 0 8px #9c4fffaa inset;
+      }
+
+      footer {
+        text-align: center;
+        padding: 12px 0;
+        color: var(--secondary-text);
+        font-size: 0.85rem;
+        text-shadow: 0 0 3px #7a57ffaa;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container-fluid mt-3">
+      <div class="row mb-4">
+        <div class="col-12">
+          <div class="header text-center">
+            <h2>🧭 Titik Peduli</h2>
+            <p>
+              <em>Integrated Information Technology for Violence Indication and Communication — Education and Direct Detection Program of Yogyakarta</em>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-3 mb-3">
+          <div class="sidebar">
+            <h5>📂 Filter Jenis Kekerasan</h5>
+            <select id="filterJenis" class="form-select mb-4">
+              <option value="all">Semua Jenis</option>
+              <option value="Fisik">Fisik</option>
+              <option value="Psikis">Psikis</option>
+              <option value="Seksual">Seksual</option>
+              <option value="TPPO">TPPO</option>
+              <option value="Penelantaran">Penelantaran</option>
+            </select>
+            <h5>📊 Statistik Ringkas</h5>
+            <div class="stat-card mt-3">
+              <p>
+                <strong>Total Kasus:</strong> <span id="totalKasus">0</span>
+              </p>
+              <p>
+                <strong>Korban Perempuan:</strong>
+                <span id="totalPerempuan">0</span>
+              </p>
+              <p><strong>Korban Pria:</strong> <span id="totalPria">0</span></p>
+            </div>
+            <a href="input.html" class="btn btn-primary w-100 mt-4"
+              >➕ Tambah Data</a
+            >
+            <a
+              href="statistik.html"
+              class="btn btn-outline-secondary w-100 mt-2"
+              >📈 Lihat Statistik</a
+            >
+          </div>
+        </div>
+        <div class="col-md-9">
+          <div id="map"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer
+      style="
+        text-align: center;
+        margin-top: 40px;
+        color: #9b59b6;
+        font-family: 'Orbitron', monospace;
+        user-select: none;
+        text-shadow: 0 0 5px #9b59b6, 0 0 10px #9b59b6, 0 0 20px #9b59b6,
+          0 0 40px #d46aff;
+        animation: neonGlow 2s ease-in-out infinite alternate;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+      "
+    >
+      &copy; 2025 Galuh Ayu. All rights reserved. Made with 💜 and code.
+    </footer>
+
+    <style>
+      @keyframes neonGlow {
+        from {
+          text-shadow: 0 0 5px #9b59b6, 0 0 10px #9b59b6, 0 0 20px #9b59b6,
+            0 0 40px #d46aff;
+          color: #9b59b6;
+        }
+        to {
+          text-shadow: 0 0 10px #d46aff, 0 0 20px #d46aff, 0 0 30px #9b59b6,
+            0 0 50px #9b59b6;
+          color: #d46aff;
+        }
+      }
+    </style>
+
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script>
+      const map = L.map("map").setView([-7.9, 110.4], 9);
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: "&copy; OpenStreetMap contributors",
+      }).addTo(map);
+
+      const markerGroup = L.layerGroup().addTo(map);
+      const koordinatKabupaten = {
+        "KULON PROGO": [-7.85, 110.1667],
+        BANTUL: [-7.91, 110.33],
+        "GUNUNG KIDUL": [-8.03, 110.62],
+        SLEMAN: [-7.715, 110.355],
+        YOGYAKARTA: [-7.7956, 110.3695],
+      };
+
+      const warnaJenis = {
+        Fisik: "#d64aff", // neon purple
+        Psikis: "#b46aff", // lighter neon purple
+        Seksual: "#9c4fff", // bright neon purple
+        TPPO: "#7a3fff", // dark neon purple
+        Penelantaran: "#5c2dcc", // deep neon violet
+      };
+
+      function getAllData() {
+        const stored = localStorage.getItem("semuaPengaduan");
+        return stored ? JSON.parse(stored) : [];
+      }
+
+      function renderMarkers(filter) {
+        markerGroup.clearLayers();
+        let totalPerempuan = 0;
+        let totalPria = 0;
+        let totalKasus = 0;
+        const data = getAllData();
+
+        data.forEach((item) => {
+          if (filter === "all" || item.jenis === filter) {
+            const lat = item.latitude || koordinatKabupaten[item.kabupaten][0];
+            const lon = item.longitude || koordinatKabupaten[item.kabupaten][1];
+            const popup = `
+              <h5 style="color:#9c4fff;">${item.kabupaten}</h5>
+              <p><strong>Nama Pelapor:</strong> ${item.nama}</p>
+              <p><strong>Jenis Kekerasan:</strong> ${item.jenis}</p>
+              <p><strong>Jenis Kelamin Korban:</strong> ${item.gender}</p>
+              <p><strong>Deskripsi:</strong><br>${item.deskripsi}</p>
+            `;
+            L.circleMarker([lat, lon], {
+              radius: 9,
+              color: warnaJenis[item.jenis] || "#9c4fff",
+              fillColor: warnaJenis[item.jenis] || "#9c4fff",
+              fillOpacity: 0.9,
+              weight: 2,
+              className: "neon-marker",
+            })
+              .bindPopup(popup)
+              .addTo(markerGroup);
+
+            totalKasus++;
+            if (item.gender === "Perempuan") totalPerempuan++;
+            if (item.gender === "Pria") totalPria++;
+          }
+        });
+
+        document.getElementById("totalKasus").textContent = totalKasus;
+        document.getElementById("totalPerempuan").textContent = totalPerempuan;
+        document.getElementById("totalPria").textContent = totalPria;
+      }
+
+      renderMarkers("all");
+      document
+        .getElementById("filterJenis")
+        .addEventListener("change", function () {
+          renderMarkers(this.value);
+        });
+    </script>
+  </body>
+</html>
